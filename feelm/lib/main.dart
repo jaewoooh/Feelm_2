@@ -3,15 +3,18 @@
 import 'package:feelm/View/mainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:feelm/View/myTableCalendar.dart'; // MyTableCalendar 파일을 import
-import 'package:feelm/View/movieScreen.dart'; // Moviescreen 파일을 import
 import 'package:feelm/View/myPageScreen.dart'; // Mypagescreen 파일을 import
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Firebase 초기화 전에 반드시 호출
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, // firebase_options.dart 파일 사용
+  );
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
