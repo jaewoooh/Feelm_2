@@ -86,7 +86,7 @@ class _CalendarscreenState extends State<Calendarscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFDCD1B5),
+      backgroundColor: const Color(0xFFD0DFF1), 
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,

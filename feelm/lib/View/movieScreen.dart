@@ -32,7 +32,7 @@ class _MoviescreenState extends State<Moviescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFDCD1B5),
+      backgroundColor: const Color(0xFFE5ECF5),
       body: Column(
         children: [
           const SizedBox(

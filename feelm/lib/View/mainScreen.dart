@@ -49,7 +49,7 @@ void initState() {
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50.0), // 앱바 높이 조정
           child: AppBar(
-            backgroundColor: const Color(0xFFDCD1B5), // 배경색 설정
+            backgroundColor: const Color(0xFF9ACBFF),
             elevation: 0, // 그림자 제거
             flexibleSpace: Column(
               mainAxisAlignment: MainAxisAlignment.end,
