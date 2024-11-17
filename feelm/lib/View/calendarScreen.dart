@@ -90,23 +90,36 @@ class _CalendarscreenState extends State<Calendarscreen> {
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center, // 수평 정렬
           children: [
             const SizedBox(height: 10),
+            // 구름 이미지
             Image.asset(
               'assets/recordCloud.png',
               width: 300,
               height: 150,
             ),
+            const SizedBox(height: 20),
+            // 상단 메시지
+            const Text(
+              'Record Your Feelm!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
             const SizedBox(height: 10),
             const Text(
-              "Click the Date!",
+              'Click the Date!',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Colors.black,
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
+            // 캘린더 추가
             MyTableCalendar(
               focusedDay: _focusedDay,
               onDaySelected: _onDaySelected,
@@ -133,6 +146,7 @@ class _CalendarscreenState extends State<Calendarscreen> {
               ),
             ),
             const SizedBox(height: 10),
+            // 포스터 리스트 추가
             PosterListView.build(itemCount: 5),
             const SizedBox(height: 50),
           ],
@@ -142,7 +156,7 @@ class _CalendarscreenState extends State<Calendarscreen> {
   }
 }
 
-// 포스터 관련 클래스는 최상위 수준에 선언
+// 포스터 리스트 관련 클래스
 class PosterListView {
   static Widget build({required int itemCount}) {
     return SizedBox(
