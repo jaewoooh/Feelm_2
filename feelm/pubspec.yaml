@@ -74,6 +74,7 @@ flutter:
     - assets/calendar.png
     - assets/calendarTouch.png
     - assets/myPage.png
+    - assets/myPageTouch.png
     - assets/recordCloud.png
     - assets/posterEx.png
     - assets/diaryCloud.png

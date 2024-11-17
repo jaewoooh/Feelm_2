@@ -20,51 +20,7 @@ class _MypagescreenState extends State<Mypagescreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF9ACBFF),
-      // 상단바 
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF9ACBFF),
-        elevation: 0,
-        actions: [
-          Spacer(),
-          MouseRegion(
-            onEnter: (_) => setState(() => movieImage = 'assets/movieTouch.png'),
-            onExit: (_) => setState(() => movieImage = 'assets/movie.png'),
-            child: IconButton(
-              icon: Image.asset(movieImage),
-              onPressed: () {
-                // 누르면 다른 화면으로 넘어가도록 하기, movieScreen.dart로 이동
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Moviescreen()),
-                );
-              },
-            ),
-          ),
-          const SizedBox(width: 120),
-          MouseRegion(
-            onEnter: (_) => setState(() => calendarImage = 'assets/calendarTouch.png'),
-            onExit: (_) => setState(() => calendarImage = 'assets/calendar.png'),
-            child: IconButton(
-              icon: Image.asset(calendarImage),
-              onPressed: () {
-                 //누르면 다른 화면으로 넘어가도록 하기, calendarScreen.dart로 이동
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Calendarscreen()),
-                  );
-              },
-            ),
-          ),
-          const SizedBox(width: 120),
-          IconButton(
-            icon: Image.asset('assets/myPage.png'),
-            onPressed: () {
-              // 현재는 myPage이기 때문에 따로 동작은 안 넣음
-            },
-          ),
-          Spacer(),
-        ],
-      ),
+
      // 하단
       body: Container(
         color: const Color(0xFFE5ECF5),
