@@ -56,16 +56,16 @@ class _MypagescreenState extends State<Mypagescreen> {
                     ),
                   ],
                 ),
-                child: Row(
+                child: const Row(
                   children: [
                     CircleAvatar(
                       radius: 40,
                       backgroundImage: AssetImage('assets/userprofile.png'), // 일단 피그마 이미지, 나중에는 사용자 설정 이미지를 가져올 수 있도록 하기...
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [ // 여기도 나중에는 사용자 정보를 가져와야함
+                      children: [ // 여기도 나중에는 사용자 정보를 가져와야함
                         Text(
                           '냠냠냠',
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -81,7 +81,7 @@ class _MypagescreenState extends State<Mypagescreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     '즐겨 찾기',
                     style: TextStyle(
                       fontSize: 18,
@@ -93,7 +93,7 @@ class _MypagescreenState extends State<Mypagescreen> {
                   Container(
                     height: 2,
                     width: 80, 
-                    color: Color(0xFF615F7B), 
+                    color: const Color(0xFF615F7B), 
                   ),
                 ],
               ),// 이미지를 넣으니 너무 깨져서 글씨로 적었습니다
