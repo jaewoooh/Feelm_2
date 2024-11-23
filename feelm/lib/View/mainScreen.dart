@@ -1,6 +1,6 @@
 // ignore_for_file: file_names
 
-import 'package:feelm/View/calendarScreen.dart';
+import 'package:feelm/View/calendar_screen.dart';
 import 'package:feelm/View/movieScreen.dart';
 import 'package:feelm/View/myPageScreen.dart';
 import 'package:flutter/material.dart';
@@ -16,18 +16,18 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-@override
-void initState() {
-  super.initState();
-  _tabController = TabController(
-    length: 3, 
-    vsync: this, 
-    initialIndex: 1, // 두 번째 탭(캘린더)로 설정
-  );
-  _tabController.addListener(() {
-    setState(() {}); // 탭 변경 시 UI 업데이트
-  });
-}
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: 1, // 두 번째 탭(캘린더)로 설정
+    );
+    _tabController.addListener(() {
+      setState(() {}); // 탭 변경 시 UI 업데이트
+    });
+  }
 
   @override
   void dispose() {
@@ -98,10 +98,10 @@ void initState() {
         // 탭바 뷰 설정
         body: TabBarView(
           controller: _tabController,
-          children: [
-            const Moviescreen(), // 영화 화면
-            const Calendarscreen(), // 캘린더 화면
-            const Mypagescreen(), // 마이페이지 화면
+          children: const [
+            Moviescreen(), // 영화 화면
+            Calendarscreen(), // 캘린더 화면
+            Mypagescreen(), // 마이페이지 화면
           ],
         ),
       ),

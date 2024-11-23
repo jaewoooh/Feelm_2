@@ -30,16 +30,15 @@ class SignUpScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // 간격을 더 줄임
-                const SizedBox(height: 0), // 화살표와 구름 이미지 간격
+                const SizedBox(height: 0),
 
                 // 구름 이미지 로고
                 Image.asset(
-                  'assets/cloud.png', // 구름 이미지 경로 설정
-                  width: 256, // 크기를 기존보다 축소
+                  'assets/cloud.png',
+                  width: 256,
                   height: 150,
                 ),
-                const SizedBox(height: 50), // 구름 이미지와 username 사이 간격을 늘림
+                const SizedBox(height: 50),
 
                 // Username 입력 필드
                 TextField(
@@ -86,8 +85,10 @@ class SignUpScreen extends StatelessWidget {
                         'email': email,
                       });
 
+                      if (!context.mounted) return; // mounted 체크 추가
                       _showSuccessDialog(context, '회원가입 성공!');
                     } catch (e) {
+                      if (!context.mounted) return; // mounted 체크 추가
                       _showErrorDialog(context, '회원가입 실패: $e');
                     }
                   },
@@ -181,6 +182,7 @@ class SignUpScreen extends StatelessWidget {
   }
 
   void _showErrorDialog(BuildContext context, String message) {
+    if (!context.mounted) return; // mounted 체크 추가
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -197,6 +199,7 @@ class SignUpScreen extends StatelessWidget {
   }
 
   void _showSuccessDialog(BuildContext context, String message) {
+    if (!context.mounted) return; // mounted 체크 추가
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
