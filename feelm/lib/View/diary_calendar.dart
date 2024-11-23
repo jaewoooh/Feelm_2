@@ -1,5 +1,6 @@
 //import 'dart:math';
 
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -105,7 +106,8 @@ class DiaryCalendar extends StatelessWidget {
   }
 }
 
-//노트쪽 감싸고 있는 Container부터
+//노트쪽 감싸고 있는 Container부터import 'dart:io';
+
 class NoteScreen extends StatefulWidget {
   final String selectedDate;
 
@@ -116,16 +118,13 @@ class NoteScreen extends StatefulWidget {
 }
 
 class _NoteScreenState extends State<NoteScreen> {
-  // TextEditingController를 추가하여 입력된 텍스트를 관리
   final TextEditingController _noteController = TextEditingController();
-
-  // 두 개의 이미지를 저장할 변수 생성
   File? _selectedImage1;
   File? _selectedImage2;
 
   @override
   void dispose() {
-    _noteController.dispose(); //메모리 누수방지
+    _noteController.dispose();
     super.dispose();
   }
 
@@ -148,7 +147,6 @@ class _NoteScreenState extends State<NoteScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 상단 날짜 및 Tickets 텍스트 배치
           Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Row(
@@ -161,22 +159,18 @@ class _NoteScreenState extends State<NoteScreen> {
                     color: Color.fromARGB(255, 166, 37, 37),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(right: 60.0),
-                  child: Text(
-                    'Tickets',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                const Text(
+                  'Tickets',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ],
             ),
           ),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // 첫 번째 이미지 업로드 박스
@@ -198,33 +192,30 @@ class _NoteScreenState extends State<NoteScreen> {
           const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Rating',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Text(
+                  'Rating',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 10),
+                RatingBar.builder(
+                  initialRating: 3.5,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  itemCount: 5,
+                  itemSize: 24,
+                  itemBuilder: (context, _) => const Icon(
+                    Icons.star,
+                    color: Colors.amber,
                   ),
-                  const SizedBox(width: 10),
-                  RatingBar.builder(
-                    initialRating: 3.5,
-                    minRating: 1,
-                    direction: Axis.horizontal,
-                    allowHalfRating: true,
-                    itemCount: 5,
-                    itemSize: 24,
-                    itemBuilder: (context, _) => const Icon(
-                      Icons.star,
-                      color: Colors.amber,
-                    ),
-                    onRatingUpdate: (rating) {
-                      print(rating);
-                    },
-                  ),
-                ],
-              ),
+                  onRatingUpdate: (rating) {
+                    log('Rating updated to: $rating');
+                  },
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 20),
@@ -255,70 +246,10 @@ class _NoteScreenState extends State<NoteScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          // 저장 버튼
           Align(
             alignment: Alignment.bottomCenter,
             child: ElevatedButton(
-              onPressed: () async {
-                final enteredText = _noteController.text;
-
-                // 저장 확인 다이얼로그를 띄우기
-                bool shouldSave = await _showSaveDialog(context);
-                if (shouldSave) {
-                  // 저장 버튼을 누른 경우
-                  if (enteredText.isNotEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('저장되었습니다: $enteredText'),
-                      ),
-                    );
-                    Navigator.pop(context); // 저장 후 화면 닫기
-                  } else {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return Dialog(
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    "내용을 입력해주세요.",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color.fromARGB(
-                                          255, 180, 168, 113),
-                                      shape: const StadiumBorder(),
-                                    ),
-                                    child: const Text(
-                                      "돌아가기",
-                                      style: TextStyle(
-                                        // fontWeight: FontWeight.bold,
-                                        // fontSize: 18,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        });
-                  }
-                }
-              },
+              onPressed: () => _handleSave(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
@@ -339,39 +270,41 @@ class _NoteScreenState extends State<NoteScreen> {
     );
   }
 
-  // 첫 번째 이미지 업로드 박스에서 앨범에서 이미지 가져오기
+  // 첫 번째 이미지 업로드 박스에서 이미지 가져오기
   void _pickImageFromGallery1() async {
-    final ImagePicker picker = ImagePicker();
+    final picker = ImagePicker();
     try {
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
+      if (image != null && mounted) {
         setState(() {
           _selectedImage1 = File(image.path);
         });
       }
     } catch (e) {
-      print("Error picking image: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('이미지를 가져오는 중 오류가 발생했습니다.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('이미지를 가져오는 중 오류가 발생했습니다.')),
+        );
+      }
     }
   }
 
-  // 두 번째 이미지 업로드 박스에서 앨범에서 이미지 가져오기
+  // 두 번째 이미지 업로드 박스에서 이미지 가져오기
   void _pickImageFromGallery2() async {
-    final ImagePicker picker = ImagePicker();
+    final picker = ImagePicker();
     try {
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
+      if (image != null && mounted) {
         setState(() {
           _selectedImage2 = File(image.path);
         });
       }
     } catch (e) {
-      print("Error picking image: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('이미지를 가져오는 중 오류가 발생했습니다.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('이미지를 가져오는 중 오류가 발생했습니다.')),
+        );
+      }
     }
   }
 
@@ -400,57 +333,83 @@ class _NoteScreenState extends State<NoteScreen> {
       ),
     );
   }
-}
 
-// 저장 확인 다이얼로그
-Future<bool> _showSaveDialog(BuildContext context) async {
-  return await showDialog(
+  Future<void> _handleSave(BuildContext context) async {
+    final enteredText = _noteController.text;
+
+    // 저장 확인 다이얼로그를 띄우기
+    final shouldSave = await _showSaveDialog(context);
+    if (!mounted) return; // 다이얼로그 이후 mounted 확인
+
+    if (shouldSave) {
+      if (enteredText.isNotEmpty) {
+        // SnackBar는 안전하게 호출
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('저장되었습니다: $enteredText')),
+            );
+          });
+        }
+
+        // Navigator.pop도 안전하게 호출
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pop(context);
+          });
+        }
+      } else {
+        // 빈 입력 다이얼로그 호출
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showEmptyContentDialog(context);
+          });
+        }
+      }
+    }
+  }
+
+  // 저장 확인 다이얼로그
+  Future<bool> _showSaveDialog(BuildContext localContext) async {
+    if (!mounted) return false;
+    return await showDialog<bool>(
+          context: localContext,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('저장하시겠습니까?'),
+              actions: [
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('취소'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('저장'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  // 빈 입력 필드 다이얼로그
+  void _showEmptyContentDialog(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+        builder: (context) => AlertDialog(
+          title: const Text("내용을 입력해주세요."),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('확인'),
             ),
-            title: const Text(
-              "저장하시겠습니까?",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(false); // 취소 버튼
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
-                      shape: const StadiumBorder(),
-                    ),
-                    child: const Text(
-                      '취소',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(true); // 저장 버튼
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 180, 168, 113),
-                      shape: const StadiumBorder(),
-                    ),
-                    child: const Text(
-                      '저장',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ) ??
-      false;
+          ],
+        ),
+      );
+    });
+  }
 }
