@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
 
+late SharedPreferences prefs;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Firebase 초기화
+  prefs = await SharedPreferences.getInstance(); //인스턴스 생성
   runApp(const MyApp());
 }
 

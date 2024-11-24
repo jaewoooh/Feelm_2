@@ -1,9 +1,6 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'movieScreen.dart'; 
-import 'calendarScreen.dart';
-
 
 class Mypagescreen extends StatefulWidget {
   const Mypagescreen({super.key});
@@ -21,7 +18,7 @@ class _MypagescreenState extends State<Mypagescreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF9ACBFF),
 
-     // 하단
+      // 하단
       body: Container(
         color: const Color(0xFFE5ECF5),
         child: Padding(
@@ -36,11 +33,11 @@ class _MypagescreenState extends State<Mypagescreen> {
                   child: Image.asset(
                     'assets/myprofile.png',
                     width: 138, // 일단 이 넓이
-                    height: 41, 
+                    height: 41,
                   ),
                 ),
               ),
-              const SizedBox(height: 20), 
+              const SizedBox(height: 20),
 
               // 프로필
               Container(
@@ -56,19 +53,22 @@ class _MypagescreenState extends State<Mypagescreen> {
                     ),
                   ],
                 ),
-                child: Row(
+                child: const Row(
                   children: [
                     CircleAvatar(
                       radius: 40,
-                      backgroundImage: AssetImage('assets/userprofile.png'), // 일단 피그마 이미지, 나중에는 사용자 설정 이미지를 가져올 수 있도록 하기...
+                      backgroundImage: AssetImage(
+                          'assets/userprofile.png'), // 일단 피그마 이미지, 나중에는 사용자 설정 이미지를 가져올 수 있도록 하기...
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [ // 여기도 나중에는 사용자 정보를 가져와야함
+                      children: [
+                        // 여기도 나중에는 사용자 정보를 가져와야함
                         Text(
                           '냠냠냠',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         Text('yummy@gmail.com'),
                       ],
@@ -81,22 +81,22 @@ class _MypagescreenState extends State<Mypagescreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     '즐겨 찾기',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF615F7B), 
+                      color: Color(0xFF615F7B),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Container(
                     height: 2,
-                    width: 80, 
-                    color: Color(0xFF615F7B), 
+                    width: 80,
+                    color: const Color(0xFF615F7B),
                   ),
                 ],
-              ),// 이미지를 넣으니 너무 깨져서 글씨로 적었습니다
+              ), // 이미지를 넣으니 너무 깨져서 글씨로 적었습니다
               /*
               Image.asset(
                 'assets/Favorites.png',
@@ -136,7 +136,8 @@ class _MypagescreenState extends State<Mypagescreen> {
   }
 
 // 나중에 영화카드 생성할 때 사용해야함, 여기에 영화 정보 합칠 예정, 이미지가 없을 경우 기본 이미지 출력하도록 함
- Widget _buildFavoriteMovieCard(String title, String imagePath, double rating, String genre, int year, int minutes) {
+  Widget _buildFavoriteMovieCard(String title, String imagePath, double rating,
+      String genre, int year, int minutes) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
@@ -164,7 +165,8 @@ class _MypagescreenState extends State<Mypagescreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Row(

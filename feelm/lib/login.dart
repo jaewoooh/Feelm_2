@@ -1,3 +1,4 @@
+import 'package:feelm/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -58,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (doc.exists) {
         if (doc['password'] == password) {
           // 로그인 성공
+          await prefs.setString('username', username); //prefs에 username 저장
           if (!mounted) return; // Widget이 dispose된 경우 guard
           Navigator.pushReplacement(
             context,

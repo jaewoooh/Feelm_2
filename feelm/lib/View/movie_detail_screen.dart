@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:feelm/json/movie_json.dart';
+import 'package:feelm/main.dart';
+
 import 'package:flutter/material.dart';
 
 class MovieDetailScreen extends StatefulWidget {
@@ -18,11 +21,14 @@ class MovieDetailScreen extends StatefulWidget {
 class _MovieDetailScreenState extends State<MovieDetailScreen> {
   MovieJson? selectedMovie;
   bool isExpanded = false; // 더보기 상태 관리 변수
+  bool isFavorite = false; // 즐겨찾기 상태 관리 변수
+  final String? loginId = prefs.getString('username'); //로그인된 아이디 가져오기
 
   @override
   void initState() {
     super.initState();
     _findMovieByTitle();
+    _checkIfFavorite();
   }
 
   void _findMovieByTitle() {
@@ -33,6 +39,43 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     );
     setState(() {
       selectedMovie = movie;
+    });
+  }
+
+  Future<void> _checkIfFavorite() async {
+    //FireStore에서 즐겨찾기 상태 확인
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(loginId)
+        .collection('favorite')
+        .doc(widget.movieName)
+        .get();
+
+    setState(() {
+      isFavorite = doc.exists;
+    });
+  }
+
+  Future<void> _toggleFavorite() async {
+    final favoriteCollection = FirebaseFirestore.instance
+        .collection('users')
+        .doc(loginId)
+        .collection('favorite');
+
+    if (isFavorite) {
+      //즐겨찾기 해제
+      await favoriteCollection.doc(widget.movieName).delete();
+    } else {
+      //즐겨찾기 추가
+      await favoriteCollection.doc(widget.movieName).set({
+        'title': selectedMovie!.title,
+        'poster': selectedMovie!.poster,
+        'genre': selectedMovie!.genre,
+        'runtime': selectedMovie!.runtime
+      });
+    }
+    setState(() {
+      isFavorite = !isFavorite;
     });
   }
 
@@ -99,13 +142,30 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
-                      Text(
-                        selectedMovie!.title ?? '',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            selectedMovie!.title ?? '',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.star,
+                              color: isFavorite ? Colors.amber : Colors.white,
+                              size: 28,
+                            ),
+                            onPressed: () {
+                              _toggleFavorite();
+                            },
+                            splashRadius: 24,
+                            iconSize: 28,
+                          )
+                        ],
                       ),
                       const SizedBox(height: 5),
                       //장르
