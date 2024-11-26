@@ -4,9 +4,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'login.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Firebase 초기화
-  runApp(const MyApp());
+
+WidgetsFlutterBinding.ensureInitialized();
+
+await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+runApp(MyApp());
+
 }
 
 class MyApp extends StatelessWidget {

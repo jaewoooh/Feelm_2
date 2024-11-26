@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:feelm/View/mainScreen.dart';
 import 'register.dart'; // SignUpScreen import
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -81,23 +82,26 @@ class LoginScreen extends StatelessWidget {
                 onPressed: () async {
                   final username = _userName.text.trim();
                   final password = _password.text.trim();
-
                   if (username.isEmpty || password.isEmpty) {
                     _showErrorDialog(context, '모든 필드를 채워주세요.');
                     return;
                   }
 
                   try {
-                    print('Firestore에서 사용자 정보 가져오는 중...');
+                    // Firestore에서 사용자 정보 가져오기
                     final doc = await FirebaseFirestore.instance
                         .collection('users')
                         .doc(username)
                         .get();
 
                     if (doc.exists) {
-                      print('사용자 정보 존재 확인: ${doc.data()}');
                       if (doc['password'] == password) {
-                        print('로그인 성공');
+                        // 로그인 성공 -> SharedPreferences에 사용자 정보 저장
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('username', doc['username']);
+                        await prefs.setString('email', doc['email']);
+
+                        // MainScreen으로 이동
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -105,24 +109,21 @@ class LoginScreen extends StatelessWidget {
                           ),
                         );
                       } else {
-                        print('비밀번호 불일치');
-                        _showErrorDialog(
-                            context, '아이디 또는 비밀번호가 올바르지 않습니다.');
+                        _showErrorDialog(context, '아이디 또는 비밀번호가 올바르지 않습니다.');
                       }
                     } else {
-                      print('사용자 정보 없음');
-                      _showErrorDialog(
-                          context, '아이디 또는 비밀번호가 올바르지 않습니다.');
+                      _showErrorDialog(context, '아이디 또는 비밀번호가 올바르지 않습니다.');
                     }
                   } catch (e) {
-                    print('로그인 실패: $e');
                     _showErrorDialog(context, '로그인 실패: $e');
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF000000),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 40, vertical: 12),
+                    horizontal: 40,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
