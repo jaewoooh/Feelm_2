@@ -42,7 +42,6 @@ dependencies:
   cloud_firestore: ^4.17.5
   shared_preferences: ^2.3.3
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -84,6 +83,8 @@ flutter:
     - assets/myprofile.png
     - assets/userprofile.png
     - assets/Favorites.png
+    - assets/topTrend.png
+    - assets/json/movie_top500.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

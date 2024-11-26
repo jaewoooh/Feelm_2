@@ -1,3 +1,4 @@
+import 'package:feelm/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,11 +6,81 @@ import 'package:feelm/View/mainScreen.dart';
 import 'register.dart'; // SignUpScreen import
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
-  static final TextEditingController _userName = TextEditingController();
-  static final TextEditingController _password = TextEditingController();
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _userName = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _userName.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  void _showErrorDialog(String message) {
+    if (!mounted) return; // Widget이 dispose된 경우 guard
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('오류'),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleLogin() async {
+    final username = _userName.text.trim();
+    final password = _password.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      _showErrorDialog('모든 필드를 채워주세요.');
+      return;
+    }
+
+    try {
+      // Firebase Firestore에서 사용자 정보 조회
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(username)
+          .get();
+
+      if (doc.exists) {
+        if (doc['password'] == password) {
+          // 로그인 성공
+          await prefs.setString('username', username); //prefs에 username 저장
+          if (!mounted) return; // Widget이 dispose된 경우 guard
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MainScreen(),
+            ),
+          );
+        } else {
+          // 비밀번호 불일치
+          _showErrorDialog('아이디 또는 비밀번호가 올바르지 않습니다.');
+        }
+      } else {
+        // 사용자 정보 없음
+        _showErrorDialog('아이디 또는 비밀번호가 올바르지 않습니다.');
+      }
+    } catch (e) {
+      // 예외 처리
+      _showErrorDialog('로그인 실패: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +150,7 @@ class LoginScreen extends StatelessWidget {
 
               // 로그인 버튼
               ElevatedButton(
+
                 onPressed: () async {
                   final username = _userName.text.trim();
                   final password = _password.text.trim();
@@ -124,6 +196,13 @@ class LoginScreen extends StatelessWidget {
                     horizontal: 40,
                     vertical: 12,
                   ),
+
+                onPressed: _handleLogin,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF000000),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -181,22 +260,6 @@ class LoginScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('오류'),
-        content: Text(message),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('확인'),
-          ),
-        ],
       ),
     );
   }
