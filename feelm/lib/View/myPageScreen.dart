@@ -51,6 +51,8 @@ class _MypagescreenState extends State<Mypagescreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF9ACBFF),
+      
+      // 하단
       body: Container(
         color: const Color(0xFFE5ECF5),
         child: Padding(
@@ -70,7 +72,7 @@ class _MypagescreenState extends State<Mypagescreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // 프로필 UI (FireStore 데이터 반영)
+              // 프로필 UI
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -95,14 +97,14 @@ class _MypagescreenState extends State<Mypagescreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          userName ?? '냠냠냠', // Firestore에서 가져온 데이터 또는 기본값
+                          userName ?? '냠냠냠', // Firestore에서 가져온 데이터 / 기본값 설정
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          userEmail ?? 'yummy@gmail.com', // Firestore에서 가져온 데이터 또는 기본값
+                          userEmail ?? 'yummy@gmail.com', // Firestore에서 가져온 데이터/ 기본값 설정
                         ),
                       ],
                     ),

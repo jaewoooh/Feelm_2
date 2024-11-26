@@ -99,9 +99,9 @@ void initState() {
         body: TabBarView(
           controller: _tabController,
           children: const [
-            Moviescreen(), // 영화 화면
-            Calendarscreen(), // 캘린더 화면
-            Mypagescreen(), // 마이페이지 화면
+            const Moviescreen(), // 영화 화면
+            const Calendarscreen(), // 캘린더 화면
+            const Mypagescreen(), // 마이페이지 화면
           ],
         ),
       ),
