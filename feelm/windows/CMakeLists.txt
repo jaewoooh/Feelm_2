@@ -1,5 +1,7 @@
 # Project-level configuration.
-cmake_minimum_required(VERSION 3.14)
+#cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.21)
+
 project(feelm LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
