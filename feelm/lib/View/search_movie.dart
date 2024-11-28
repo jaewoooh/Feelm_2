@@ -91,7 +91,7 @@ class _SearchMovieState extends State<SearchMovie> {
                         crossAxisCount: 3, // 한 행에 3개의 포스터
                         crossAxisSpacing: 10, // 가로 간격
                         mainAxisSpacing: 10, // 세로 간격
-                        childAspectRatio: 0.7, // 포스터 비율
+                        childAspectRatio: 0.5, // 포스터 비율
                       ),
                       itemCount: filteredMovies.length,
                       itemBuilder: (context, index) {
@@ -142,7 +142,7 @@ class _SearchMovieState extends State<SearchMovie> {
                                 ),
                               ),
                               Text(
-                                movie.director ?? '',
+                                movie.genre ?? '',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(

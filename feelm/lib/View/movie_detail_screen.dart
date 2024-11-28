@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:feelm/View/calendar_screen.dart';
+import 'package:feelm/View/mainScreen.dart';
 import 'package:feelm/json/movie_json.dart';
 import 'package:feelm/main.dart';
 
@@ -284,6 +288,44 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                       const SizedBox(
                         height: 10,
                       ),
+
+                      Center(
+                        child: TextButton(
+                          onPressed: () {
+                            if (isFavorite) {
+                              print("record my feelm");
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const MainScreen()));
+                            }
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 120, vertical: 10),
+                            backgroundColor: isFavorite
+                                ? const Color(0xFF757575)
+                                : Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 5, //그림자 효과
+                            shadowColor: Colors.black.withOpacity(0.2), //그림자 색상
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown, // 텍스트가 버튼 안에 맞도록 축소
+                            child: Text(
+                              isFavorite ? 'record my feelm' : '즐겨찾기를 추가해주세요',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),

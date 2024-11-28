@@ -139,7 +139,7 @@ class _MoviescreenState extends State<Moviescreen> {
                   height: 220,
                   child: PageView.builder(
                     controller: _pageController,
-                    itemCount: movieList.length > 5 ? 5 : movieList.length,
+                    itemCount: movieList.length > 10 ? 10 : movieList.length,
                     itemBuilder: (context, index) {
                       return _buildPosterCard(index);
                     },
@@ -172,7 +172,7 @@ class _MoviescreenState extends State<Moviescreen> {
             onPressed: () {
               if (selectedMovie != null) {
                 final selectedMovie = movieList[_currentPageIndex];
-                log('Feelm recorded for');
+                log('영화정보보기');
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -192,7 +192,7 @@ class _MoviescreenState extends State<Moviescreen> {
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 100, vertical: 10),
               child: Text(
-                'Record My Feelm',
+                '영화 정보 보기',
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
             ),
@@ -222,7 +222,7 @@ class _MoviescreenState extends State<Moviescreen> {
           height: 200,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: 10, // 예시로 10개의 아이템만 표시
+            itemCount: 5, // 예시로 10개의 아이템만 표시
             itemBuilder: (context, index) {
               return _buildTrendingMovieCard(index);
             },
@@ -264,7 +264,7 @@ class _MoviescreenState extends State<Moviescreen> {
               ),
             ),
           ),
-          const SizedBox(height: 5),
+          //const SizedBox(height: 5),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
@@ -276,20 +276,20 @@ class _MoviescreenState extends State<Moviescreen> {
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: [
-                Icon(Icons.star, color: Colors.yellow, size: 14),
-                SizedBox(width: 4),
-                Text('4.5',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                    )),
-              ],
-            ),
-          ),
+          // const Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 8.0),
+          //   child: Row(
+          //     children: [
+          //       Icon(Icons.star, color: Colors.yellow, size: 14),
+          //       SizedBox(width: 4),
+          //       Text('4.5',
+          //           style: TextStyle(
+          //             fontSize: 12,
+          //             color: Colors.white,
+          //           )),
+          //     ],
+          //   ),
+          // ),
           const SizedBox(height: 5),
         ],
       ),

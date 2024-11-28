@@ -1,7 +1,9 @@
 import 'dart:developer';
 
+import 'package:feelm/View/calendar_poster.dart';
 import 'package:feelm/View/diary_calendar.dart';
 import 'package:feelm/View/my_table_calendar.dart';
+import 'package:feelm/main.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,6 +16,7 @@ class Calendarscreen extends StatefulWidget {
 
 class _CalendarscreenState extends State<Calendarscreen> {
   DateTime _focusedDay = DateTime.now();
+  final String? loginId = prefs.getString('username'); //로그인된 아이디 가져오기
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     setState(() {
@@ -148,54 +151,9 @@ class _CalendarscreenState extends State<Calendarscreen> {
             ),
             const SizedBox(height: 10),
             // 포스터 리스트 추가
-            PosterListView.build(itemCount: 5),
+            PosterListView(currentUser: loginId!),
             const SizedBox(height: 50),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// 포스터 리스트 관련 클래스
-class PosterListView {
-  static Widget build({required int itemCount}) {
-    return SizedBox(
-      height: 200,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(itemCount, (index) {
-            return Container(
-              width: 140,
-              margin: const EdgeInsets.only(left: 30, right: 30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.black54,
-                  width: 2.0,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 2,
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  "Poster ${index + 1}",
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            );
-          }),
         ),
       ),
     );
