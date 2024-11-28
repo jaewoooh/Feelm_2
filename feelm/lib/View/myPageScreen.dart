@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'movieScreen.dart';
-import 'calendarScreen.dart';
-
+import 'calendar_screen.dart';
 
 class Mypagescreen extends StatefulWidget {
   const Mypagescreen({super.key});
@@ -67,16 +66,13 @@ class _MypagescreenState extends State<Mypagescreen> {
                   padding: const EdgeInsets.only(left: 16.0),
                   child: Image.asset(
                     'assets/myprofile.png',
-
                     width: 138,
-
                     height: 41,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-
-              // 프로필
+              // 프로필 UI
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -90,14 +86,13 @@ class _MypagescreenState extends State<Mypagescreen> {
                     ),
                   ],
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     const CircleAvatar(
                       radius: 40,
                       backgroundImage: AssetImage('assets/userprofile.png'),
-
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -109,14 +104,8 @@ class _MypagescreenState extends State<Mypagescreen> {
                           ),
                         ),
                         Text(
-                          userEmail ?? 'yummy@gmail.com', // Firestore에서 가져온 데이터/ 기본값 설정
-
-                        // 여기도 나중에는 사용자 정보를 가져와야함
-                        Text(
-                          '냠냠냠',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-
+                          userEmail ??
+                              'yummy@gmail.com', // Firestore에서 가져온 데이터/ 기본값 설정
                         ),
                       ],
                     ),
@@ -142,14 +131,6 @@ class _MypagescreenState extends State<Mypagescreen> {
                     color: const Color(0xFF615F7B),
                   ),
                 ],
-
-              ),
-              /*
-              Image.asset(
-                'assets/Favorites.png',
-                width: 200, 
-                height: 41, 
-
               ),
               const SizedBox(height: 10),
               Expanded(
@@ -180,9 +161,6 @@ class _MypagescreenState extends State<Mypagescreen> {
       ),
     );
   }
-
-
-// 나중에 영화카드 생성할 때 사용해야함, 여기에 영화 정보 합칠 예정, 이미지가 없을 경우 기본 이미지 출력하도록 함
 
   Widget _buildFavoriteMovieCard(String title, String imagePath, double rating,
       String genre, int year, int minutes) {
@@ -217,8 +195,6 @@ class _MypagescreenState extends State<Mypagescreen> {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
-
-                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Row(
