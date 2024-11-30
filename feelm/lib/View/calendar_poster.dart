@@ -4,14 +4,19 @@ import 'dart:developer';
 
 class PosterListView extends StatefulWidget {
   final String currentUser;
+  final Function(int?) onPosterSelected; // 선택된 포스터를 전달하는 콜백
 
-  const PosterListView({super.key, required this.currentUser});
+  const PosterListView({
+    super.key,
+    required this.currentUser,
+    required this.onPosterSelected,
+  });
 
   @override
-  _PosterListViewState createState() => _PosterListViewState();
+  PosterListViewState createState() => PosterListViewState();
 }
 
-class _PosterListViewState extends State<PosterListView>
+class PosterListViewState extends State<PosterListView>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int?> selectedPosterIndex =
@@ -37,6 +42,8 @@ class _PosterListViewState extends State<PosterListView>
             .collection('users')
             .doc(widget.currentUser)
             .collection('favorite')
+            .where('diaryText', isEqualTo: "") // diaryText가 null인 경우
+            .where('savedDate', isEqualTo: "") // savedDate가 null인 경우
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -82,7 +89,8 @@ class _PosterListViewState extends State<PosterListView>
 
                   return GestureDetector(
                     onTap: () {
-                      selectedPosterIndex.value = index; // ValueNotifier를 업데이트
+                      selectedPosterIndex.value = index;
+                      widget.onPosterSelected(index); // 선택된 포스터 전달
                       log("Selected movie: $title");
 
                       // 선택한 포스터로 스크롤 유지

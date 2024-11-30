@@ -1,18 +1,21 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:feelm/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class NoteScreen extends StatefulWidget {
   final String selectedDate;
-  final String selectedPosterImageUrl; // 선택된 포스터 이미지 URL 추가
+  final String posterImageUrl; // 포스터 이미지 URL
 
   const NoteScreen({
     super.key,
     required this.selectedDate,
-    required this.selectedPosterImageUrl,
+    required this.posterImageUrl,
   });
 
   @override
@@ -21,13 +24,59 @@ class NoteScreen extends StatefulWidget {
 
 class _NoteScreenState extends State<NoteScreen> {
   final TextEditingController _noteController = TextEditingController();
-  //File? _selectedImage1;
+  File? _selectedImage1;
   File? _selectedImage2;
+  double ratingPoint = 3.0;
+
+  final String? loginId = prefs.getString('username'); //로그인된 아이디 가져오기
 
   @override
-  void dispose() {
-    _noteController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+
+    _loadDiaryData(); // Firebase 데이터 로드 함수 호출
+  }
+
+  // Firebase에서 데이터 로드
+  Future<void> _loadDiaryData() async {
+    try {
+      final userDoc = FirebaseFirestore.instance
+          .collection('users')
+          .doc(loginId); // 사용자의 문서 ID
+
+      final favoriteCollection = userDoc.collection('favorite');
+
+      // poster와 일치하는 영화 문서를 가져옴
+      final querySnapshot = await favoriteCollection
+          .where('poster', isEqualTo: widget.posterImageUrl)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final doc = querySnapshot.docs.first;
+
+        // Firestore에서 데이터 가져오기
+        final data = doc.data();
+        final loadedRating = data['rating'] as double?;
+        final loadedDiaryText = data['diaryText'] as String?;
+        final loadedTicketPath = data['ticket'] as String?;
+
+        // 상태 업데이트
+        setState(() {
+          ratingPoint = loadedRating!;
+          _noteController.text = loadedDiaryText ?? '';
+          if (loadedTicketPath != null && loadedTicketPath.isNotEmpty) {
+            _selectedImage2 = File(loadedTicketPath);
+          }
+        });
+      }
+    } catch (e) {
+      log('Error loading diary data: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('다이어리 기록이 없습니다')),
+        );
+      }
+    }
   }
 
   @override
@@ -55,7 +104,8 @@ class _NoteScreenState extends State<NoteScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.selectedDate,
+                  DateFormat('yyyy-MM-dd')
+                      .format(DateTime.parse(widget.selectedDate)),
                   style: const TextStyle(
                     fontSize: 16,
                     color: Color.fromARGB(255, 166, 37, 37),
@@ -79,14 +129,18 @@ class _NoteScreenState extends State<NoteScreen> {
               _buildImageUploadBox(
                 width: 140,
                 height: 180,
-                imageUrl: widget.selectedPosterImageUrl,
+                selectedImage: _selectedImage1,
+                onTap: () {
+                  //log("click");
+                }, // null인 경우 빈 함수로 기본 처리 ,
+                initialImageUrl: widget.posterImageUrl, // 전달받은 포스터 URL 사용
               ),
               // 두 번째 이미지 업로드 박스
               _buildImageUploadBox(
                 width: 160,
                 height: 120,
                 selectedImage: _selectedImage2,
-                onTap: _pickImageFromGallery2,
+                onTap: _pickImageFromGallery,
               ),
             ],
           ),
@@ -102,7 +156,7 @@ class _NoteScreenState extends State<NoteScreen> {
                 ),
                 const SizedBox(width: 10),
                 RatingBar.builder(
-                  initialRating: 3.5,
+                  initialRating: ratingPoint,
                   minRating: 1,
                   direction: Axis.horizontal,
                   allowHalfRating: true,
@@ -113,7 +167,9 @@ class _NoteScreenState extends State<NoteScreen> {
                     color: Colors.amber,
                   ),
                   onRatingUpdate: (rating) {
-                    log('Rating updated to: $rating');
+                    ratingPoint = rating;
+
+                    log('Rating updated to: $ratingPoint');
                   },
                 ),
               ],
@@ -171,37 +227,8 @@ class _NoteScreenState extends State<NoteScreen> {
     );
   }
 
-  // 이미지 업로드 박스 생성
-  Widget _buildImageUploadBox({
-    required double width,
-    required double height,
-    String? imageUrl,
-    File? selectedImage,
-    VoidCallback? onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey, width: 1),
-        ),
-        child: selectedImage != null
-            ? Image.file(selectedImage, fit: BoxFit.cover)
-            : (imageUrl != null
-                ? Image.network(imageUrl, fit: BoxFit.cover)
-                : const Center(
-                    child: Icon(Icons.camera_alt, color: Colors.grey),
-                  )),
-      ),
-    );
-  }
-
   // 두 번째 이미지 업로드 박스에서 이미지 가져오기
-  void _pickImageFromGallery2() async {
+  void _pickImageFromGallery() async {
     final picker = ImagePicker();
     try {
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -219,59 +246,169 @@ class _NoteScreenState extends State<NoteScreen> {
     }
   }
 
+  // 이미지 업로드 박스 생성
+  Widget _buildImageUploadBox({
+    required double width,
+    required double height,
+    required File? selectedImage,
+    required VoidCallback onTap,
+    String? initialImageUrl, // 초기 이미지 URL 추가
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey, width: 1),
+        ),
+        child: selectedImage != null
+            ? Image.file(selectedImage, fit: BoxFit.cover)
+            : (initialImageUrl != null
+                ? Image.network(initialImageUrl, fit: BoxFit.cover)
+                : const Icon(Icons.camera_alt)),
+      ),
+    );
+  }
+
   Future<void> _handleSave(BuildContext context) async {
     final enteredText = _noteController.text;
 
-    if (enteredText.isEmpty) {
-      _showEmptyContentDialog(context);
-      return;
+    // 저장 확인 다이얼로그를 띄우기
+    final shouldSave = await _showSaveDialog(context);
+    if (!mounted) return; // 다이얼로그 이후 mounted 확인
+
+    if (shouldSave) {
+      if (enteredText.isNotEmpty) {
+        try {
+          // Firebase 업데이트 로직 추가
+          final userDoc = FirebaseFirestore.instance
+              .collection('users')
+              .doc(loginId); // 사용자의 문서 ID
+
+          final favoriteCollection = userDoc.collection('favorite');
+
+          // poster와 일치하는 영화 문서를 가져옴
+          final querySnapshot = await favoriteCollection
+              .where('poster', isEqualTo: widget.posterImageUrl)
+              .get();
+
+          if (querySnapshot.docs.isNotEmpty) {
+            final docRef = querySnapshot.docs.first.reference;
+
+            await docRef.update({
+              'rating': ratingPoint,
+              'ticket': _selectedImage2 != null ? _selectedImage2!.path : '',
+              'diaryText': enteredText,
+              'savedDate': DateFormat('yyyy-MM-dd')
+                  .format(DateTime.parse(widget.selectedDate)),
+            });
+            // SnackBar는 안전하게 호출
+            if (mounted) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text('저장되었습니다: $enteredText, $ratingPoint')),
+                );
+              });
+            }
+
+            // Navigator.pop도 안전하게 호출
+            if (mounted) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pop(context, {
+                  'savedDate': DateFormat('yyyy-MM-dd')
+                      .format(DateTime.parse(widget.selectedDate)),
+                  'posterImageUrl': widget.posterImageUrl,
+                });
+              });
+            }
+          } else {
+            // 일치하는 영화가 없는 경우
+            if (mounted) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _showEmptyContentDialog(context, "저장할 영화를 찾을 수 없습니다.");
+              });
+            }
+          }
+        } catch (e) {
+          // 오류 처리
+          if (mounted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showEmptyContentDialog(context, "저장 중 오류가 발생했습니다: $e");
+            });
+          }
+        }
+      } else {
+        // 빈 입력 입력 다이얼로그 호출
+        String message = enteredText.isEmpty ? "내용을 입력해주세요." : "";
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showEmptyContentDialog(context, message);
+          });
+        }
+      }
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('저장되었습니다: $enteredText')),
-    );
-
-    Navigator.pop(context);
   }
-  // // 저장 확인 다이얼로그
-  // Future<bool> _showSaveDialog(BuildContext localContext) async {
-  //   if (!mounted) return false;
-  //   return await showDialog<bool>(
-  //         context: localContext,
-  //         builder: (context) {
-  //           return AlertDialog(
-  //             title: const Text('저장하시겠습니까?'),
-  //             actions: [
-  //               ElevatedButton(
-  //                 onPressed: () => Navigator.of(context).pop(false),
-  //                 child: const Text('취소'),
-  //               ),
-  //               ElevatedButton(
-  //                 onPressed: () => Navigator.of(context).pop(true),
-  //                 child: const Text('저장'),
-  //               ),
-  //             ],
-  //           );
-  //         },
-  //       ) ??
-  //       false;
-  // }
+
+  // 저장 확인 다이얼로그
+  Future<bool> _showSaveDialog(BuildContext localContext) async {
+    if (!mounted) return false;
+    return await showDialog<bool>(
+          context: localContext,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text(
+                '저장하시겠습니까?',
+                textAlign: TextAlign.center,
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              actions: [
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  style: ElevatedButton.styleFrom(
+                    shape: const StadiumBorder(),
+                  ),
+                  child: const Text('취소'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: ElevatedButton.styleFrom(
+                    shape: const StadiumBorder(),
+                  ),
+                  child: const Text('저장'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
 
   // 빈 입력 필드 다이얼로그
-  void _showEmptyContentDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("내용을 입력해주세요."),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('확인'),
+  void _showEmptyContentDialog(BuildContext context, String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            message,
+            textAlign: TextAlign.center,
           ),
-        ],
-      ),
-    );
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

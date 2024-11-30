@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:feelm/View/calendar_poster.dart';
 import 'package:feelm/View/diary_calendar.dart';
 import 'package:feelm/View/my_table_calendar.dart';
@@ -17,75 +18,141 @@ class Calendarscreen extends StatefulWidget {
 class _CalendarscreenState extends State<Calendarscreen> {
   DateTime _focusedDay = DateTime.now();
   final String? loginId = prefs.getString('username'); //로그인된 아이디 가져오기
-  int? selectedPosterIndex; // PosterListView에서 선택된 포스터의 인덱스
+  static final ValueNotifier<int?> selectedPosterIndexNotifier =
+      ValueNotifier<int?>(null);
 
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _onDaySelected(
+      DateTime selectedDay, DateTime focusedDay, String? posterUrl) {
     setState(() {
       _focusedDay = focusedDay;
     });
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+    if (posterUrl != null) {
+      // 클릭한 날짜에 해당하는 포스터가 존재하면 바로 DiaryCalendar로 이동
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DiaryCalendar(
+            selectedDate: selectedDay.toIso8601String(),
+            posterImageUrl: posterUrl,
           ),
-          title: Text(
-            "${DateFormat('MM월 dd일').format(selectedDay)}로 이동하시겠습니까?",
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.black,
+        ),
+      );
+    } else {
+      // 기존 동작: 포스터 선택 후 이동
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 180, 168, 113),
-                    shape: const StadiumBorder(),
-                  ),
-                  child: const Text(
-                    '취소',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DiaryCalendar(
-                          selectedDate:
-                              DateFormat('yyyy년 MM월 dd일').format(selectedDay),
-                        ),
-                      ),
-                    );
-                    log("${DateFormat('MM월 dd일').format(selectedDay)}로 이동");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 180, 168, 113),
-                    shape: const StadiumBorder(),
-                  ),
-                  child: const Text(
-                    '네',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ],
+            title: Text(
+              "${DateFormat('MM월 dd일').format(selectedDay)}로 이동하시겠습니까?",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.black,
+              ),
             ),
-          ],
-        );
-      },
-    );
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 180, 168, 113),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: const Text(
+                      '취소',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (selectedPosterIndexNotifier.value == null) {
+                        // 포스터가 선택되지 않았을 경우 경고 표시
+                        Navigator.of(context).pop(); // 기존 다이얼로그 닫기
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text(
+                              "포스터를 먼저 선택해주세요.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            actionsAlignment: MainAxisAlignment.center,
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // 경고 다이얼로그 닫기
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: const StadiumBorder(),
+                                ),
+                                child: const Text(
+                                  "확인",
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        // 선택된 포스터 제목 가져오기
+                        String selectedPosterImage = '';
+                        FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(loginId)
+                            .collection('favorite')
+                            .get()
+                            .then((snapshot) {
+                          final doc =
+                              snapshot.docs[selectedPosterIndexNotifier.value!];
+                          selectedPosterImage = doc['poster'] ?? '';
+                        }).whenComplete(() {
+                          // 포스터가 선택된 경우 DiaryCalendar로 이동
+                          Navigator.of(context).pop(); // 기존 다이얼로그 닫기
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DiaryCalendar(
+                                selectedDate: selectedDay.toIso8601String(),
+                                posterImageUrl:
+                                    selectedPosterImage, // 포스터 URL 전달
+                              ),
+                            ),
+                          );
+                          log("${DateFormat('MM월 dd일').format(selectedDay)}로 이동");
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 180, 168, 113),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: const Text(
+                      '네',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -152,7 +219,12 @@ class _CalendarscreenState extends State<Calendarscreen> {
             ),
             const SizedBox(height: 10),
             // 포스터 리스트 추가
-            PosterListView(currentUser: loginId!),
+            PosterListView(
+              currentUser: loginId!,
+              onPosterSelected: (index) {
+                selectedPosterIndexNotifier.value = index;
+              },
+            ),
             const SizedBox(height: 50),
           ],
         ),
