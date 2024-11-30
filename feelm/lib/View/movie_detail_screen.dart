@@ -1,7 +1,7 @@
-import 'dart:math';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:feelm/View/calendar_screen.dart';
+
 import 'package:feelm/View/mainScreen.dart';
 import 'package:feelm/json/movie_json.dart';
 import 'package:feelm/main.dart';
@@ -293,7 +293,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         child: TextButton(
                           onPressed: () {
                             if (isFavorite) {
-                              print("record my feelm");
+                              log("record my feelm");
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

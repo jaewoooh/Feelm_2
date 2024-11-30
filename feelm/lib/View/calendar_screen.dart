@@ -17,6 +17,7 @@ class Calendarscreen extends StatefulWidget {
 class _CalendarscreenState extends State<Calendarscreen> {
   DateTime _focusedDay = DateTime.now();
   final String? loginId = prefs.getString('username'); //로그인된 아이디 가져오기
+  int? selectedPosterIndex; // PosterListView에서 선택된 포스터의 인덱스
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     setState(() {
@@ -90,7 +91,7 @@ class _CalendarscreenState extends State<Calendarscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFDCD1B5),
+      backgroundColor: const Color(0xFFBAD3EE), //0xFFBAD3EE ,0xFFDCD1B5
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,

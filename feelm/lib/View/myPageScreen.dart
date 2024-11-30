@@ -1,10 +1,10 @@
 // ignore_for_file: file_names
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'movieScreen.dart';
-import 'calendar_screen.dart';
 
 class Mypagescreen extends StatefulWidget {
   const Mypagescreen({super.key});
@@ -42,7 +42,7 @@ class _MypagescreenState extends State<Mypagescreen> {
           });
         }
       } catch (e) {
-        print('Firestore 데이터 가져오기 실패: $e');
+        log('Firestore 데이터 가져오기 실패: $e');
       }
     }
   }
