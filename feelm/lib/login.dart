@@ -5,11 +5,32 @@ import 'package:feelm/View/mainScreen.dart';
 import 'register.dart'; // SignUpScreen import
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   static final TextEditingController _userName = TextEditingController();
   static final TextEditingController _password = TextEditingController();
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('오류'),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +42,12 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 구름 이미지 로고
               Image.asset(
                 'assets/cloud.png', // 구름 이미지 경로 설정
                 width: 296,
                 height: 175,
               ),
               const SizedBox(height: 40),
-
-              // 사용자 이름 입력 필드
               TextField(
                 controller: _userName,
                 decoration: InputDecoration(
@@ -48,8 +66,6 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // 비밀번호 입력 필드
               TextField(
                 controller: _password,
                 obscureText: true,
@@ -76,19 +92,17 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 30),
-
-              // 로그인 버튼
               ElevatedButton(
                 onPressed: () async {
                   final username = _userName.text.trim();
                   final password = _password.text.trim();
+
                   if (username.isEmpty || password.isEmpty) {
                     _showErrorDialog(context, '모든 필드를 채워주세요.');
                     return;
                   }
 
                   try {
-                    // Firestore에서 사용자 정보 가져오기
                     final doc = await FirebaseFirestore.instance
                         .collection('users')
                         .doc(username)
@@ -96,26 +110,35 @@ class LoginScreen extends StatelessWidget {
 
                     if (doc.exists) {
                       if (doc['password'] == password) {
-                        // 로그인 성공 -> SharedPreferences에 사용자 정보 저장
                         final prefs = await SharedPreferences.getInstance();
                         await prefs.setString('username', doc['username']);
                         await prefs.setString('email', doc['email']);
 
                         // MainScreen으로 이동
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
-                          ),
-                        );
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MainScreen(),
+                              ),
+                            );
+                          }
+                        });
                       } else {
-                        _showErrorDialog(context, '아이디 또는 비밀번호가 올바르지 않습니다.');
+                        if (context.mounted) {
+                          _showErrorDialog(context, '아이디 또는 비밀번호가 올바르지 않습니다.');
+                        }
                       }
                     } else {
-                      _showErrorDialog(context, '아이디 또는 비밀번호가 올바르지 않습니다.');
+                      if (context.mounted) {
+                        _showErrorDialog(context, '아이디 또는 비밀번호가 올바르지 않습니다.');
+                      }
                     }
                   } catch (e) {
-                    _showErrorDialog(context, '로그인 실패: $e');
+                    if (context.mounted) {
+                      _showErrorDialog(context, '로그인 실패: $e');
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -138,8 +161,6 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // 비밀번호 찾기
               const Text(
                 'forgot password?',
                 style: TextStyle(
@@ -148,8 +169,6 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // 회원가입 링크
               RichText(
                 text: TextSpan(
                   text: "Don't have an account, ",
@@ -181,22 +200,6 @@ class LoginScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('오류'),
-        content: Text(message),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('확인'),
-          ),
-        ],
       ),
     );
   }

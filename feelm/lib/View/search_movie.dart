@@ -36,7 +36,7 @@ class _SearchMovieState extends State<SearchMovie> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search Movie'),
-        backgroundColor: const Color.fromARGB(255, 91, 177, 234), // AppBar 색상
+        backgroundColor: const Color(0xFFBAD3EE), // AppBar 색상
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -159,7 +159,7 @@ class _SearchMovieState extends State<SearchMovie> {
           ],
         ),
       ),
-      backgroundColor: const Color(0xFFE5ECF5), // 배경색 설정
+      backgroundColor: const Color(0xFFBAD3EE), // 배경색 설정
     );
   }
 }

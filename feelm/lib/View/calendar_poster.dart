@@ -1,10 +1,13 @@
+//CalendarPoster
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:feelm/View/calendar_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 
 class PosterListView extends StatefulWidget {
   final String currentUser;
-  final Function(int?) onPosterSelected; // 선택된 포스터를 전달하는 콜백
+  final Function(String?) onPosterSelected; // 선택된 포스터를 전달하는 콜백
 
   const PosterListView({
     super.key,
@@ -19,8 +22,8 @@ class PosterListView extends StatefulWidget {
 class PosterListViewState extends State<PosterListView>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
-  final ValueNotifier<int?> selectedPosterIndex =
-      ValueNotifier<int?>(null); // ValueNotifier로 선택 상태 관리
+  // final ValueNotifier<String?> selectedPosterTitle =
+  //     ValueNotifier<String?>(null); // ValueNotifier로 선택 상태 관리
 
   @override
   bool get wantKeepAlive => true; // 상태 유지 활성화
@@ -28,7 +31,7 @@ class PosterListViewState extends State<PosterListView>
   @override
   void dispose() {
     _scrollController.dispose(); // ScrollController 해제
-    selectedPosterIndex.dispose(); // ValueNotifier 해제
+    //selectedPosterTitle.dispose(); // ValueNotifier 해제
     super.dispose();
   }
 
@@ -70,9 +73,10 @@ class PosterListViewState extends State<PosterListView>
 
           final favoriteMovies = snapshot.data!.docs;
 
-          return ValueListenableBuilder<int?>(
-            valueListenable: selectedPosterIndex, // 선택 상태를 ValueNotifier로 관찰
-            builder: (context, selectedIndex, child) {
+          return ValueListenableBuilder<String?>(
+            valueListenable: CalendarscreenState
+                .selectedPosterTitleNotifier, // 선택 상태를 ValueNotifier로 관찰
+            builder: (context, selectedTitle, child) {
               return ListView.builder(
                 controller: _scrollController, // ScrollController 유지
                 scrollDirection: Axis.horizontal,
@@ -82,15 +86,16 @@ class PosterListViewState extends State<PosterListView>
                   final title = movie['title'] ?? 'Unknown';
                   final poster = movie['poster'] ?? '';
 
-                  final isSelected = index == selectedIndex;
+                  final isSelected = title == selectedTitle;
                   final borderColor =
                       isSelected ? Colors.yellow : Colors.transparent;
                   final borderWidth = isSelected ? 3.0 : 1.0;
 
                   return GestureDetector(
                     onTap: () {
-                      selectedPosterIndex.value = index;
-                      widget.onPosterSelected(index); // 선택된 포스터 전달
+                      CalendarscreenState.selectedPosterTitleNotifier.value =
+                          title;
+                      widget.onPosterSelected(title); // 선택된 포스터 전달
                       log("Selected movie: $title");
 
                       // 선택한 포스터로 스크롤 유지

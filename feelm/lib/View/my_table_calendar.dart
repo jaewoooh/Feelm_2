@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:feelm/main.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -19,6 +20,7 @@ class MyTableCalendar extends StatefulWidget {
 class _MyTableCalendarState extends State<MyTableCalendar> {
   DateTime? _selectedDay;
   Map<DateTime, String> _savedPosters = {}; // 날짜별 포스터 저장
+  final String? loginId = prefs.getString('username'); //로그인된 아이디 가져오기
 
   @override
   void initState() {
@@ -30,7 +32,7 @@ class _MyTableCalendarState extends State<MyTableCalendar> {
   void _listenToFirebaseUpdates() {
     final userDoc = FirebaseFirestore.instance
         .collection('users')
-        .doc('new0628') // 유저 ID
+        .doc(loginId) // 유저 ID
         .collection('favorite');
 
     userDoc.snapshots().listen((snapshot) {

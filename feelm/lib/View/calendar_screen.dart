@@ -1,3 +1,5 @@
+// CalendarScreen
+
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,14 +14,14 @@ class Calendarscreen extends StatefulWidget {
   const Calendarscreen({super.key});
 
   @override
-  State<Calendarscreen> createState() => _CalendarscreenState();
+  State<Calendarscreen> createState() => CalendarscreenState();
 }
 
-class _CalendarscreenState extends State<Calendarscreen> {
+class CalendarscreenState extends State<Calendarscreen> {
   DateTime _focusedDay = DateTime.now();
   final String? loginId = prefs.getString('username'); //로그인된 아이디 가져오기
-  static final ValueNotifier<int?> selectedPosterIndexNotifier =
-      ValueNotifier<int?>(null);
+  static final ValueNotifier<String?> selectedPosterTitleNotifier =
+      ValueNotifier<String?>(null);
 
   @override
   void initState() {
@@ -80,7 +82,9 @@ class _CalendarscreenState extends State<Calendarscreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      if (selectedPosterIndexNotifier.value == null) {
+                      final String? selectedPosterTitle =
+                          selectedPosterTitleNotifier.value;
+                      if (selectedPosterTitle == null) {
                         // 포스터가 선택되지 않았을 경우 경고 표시
                         Navigator.of(context).pop(); // 기존 다이얼로그 닫기
                         showDialog(
@@ -109,32 +113,8 @@ class _CalendarscreenState extends State<Calendarscreen> {
                           ),
                         );
                       } else {
-                        // 선택된 포스터 제목 가져오기
-                        String selectedPosterImage = '';
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(loginId)
-                            .collection('favorite')
-                            .get()
-                            .then((snapshot) {
-                          final doc =
-                              snapshot.docs[selectedPosterIndexNotifier.value!];
-                          selectedPosterImage = doc['poster'] ?? '';
-                        }).whenComplete(() {
-                          // 포스터가 선택된 경우 DiaryCalendar로 이동
-                          Navigator.of(context).pop(); // 기존 다이얼로그 닫기
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DiaryCalendar(
-                                selectedDate: selectedDay.toIso8601String(),
-                                posterImageUrl:
-                                    selectedPosterImage, // 포스터 URL 전달
-                              ),
-                            ),
-                          );
-                          log("${DateFormat('MM월 dd일').format(selectedDay)}로 이동");
-                        });
+                        // 포스터가 선택된 경우 처리
+                        _handleSelectedPoster(selectedDay, selectedPosterTitle);
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -153,6 +133,40 @@ class _CalendarscreenState extends State<Calendarscreen> {
         },
       );
     }
+  }
+
+  void _navigateToDiaryCalendar(
+      DateTime selectedDay, String selectedPosterImage) {
+    //if (!mounted) return; // 위젯이 비활성화된 경우 중단
+    Navigator.of(context).pop(); // 기존 다이얼로그 닫기
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DiaryCalendar(
+          selectedDate: selectedDay.toIso8601String(),
+          posterImageUrl: selectedPosterImage, // 포스터 URL 전달
+        ),
+      ),
+    );
+  }
+
+  void _handleSelectedPoster(DateTime selectedDay, String selectedPosterTitle) {
+    String selectedPosterImage = '';
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(loginId)
+        .collection('favorite')
+        .where('title', isEqualTo: selectedPosterTitle)
+        .get()
+        .then((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        selectedPosterImage = snapshot.docs.first['poster'] ?? '';
+      }
+    }).whenComplete(() {
+      _navigateToDiaryCalendar(
+          selectedDay, selectedPosterImage); // 안전한 Navigator 호출
+      log("${DateFormat('MM월 dd일').format(selectedDay)}로 이동");
+    });
   }
 
   @override
@@ -221,8 +235,8 @@ class _CalendarscreenState extends State<Calendarscreen> {
             // 포스터 리스트 추가
             PosterListView(
               currentUser: loginId!,
-              onPosterSelected: (index) {
-                selectedPosterIndexNotifier.value = index;
+              onPosterSelected: (title) {
+                selectedPosterTitleNotifier.value = title;
               },
             ),
             const SizedBox(height: 50),

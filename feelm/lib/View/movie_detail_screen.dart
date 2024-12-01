@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:feelm/View/mainScreen.dart';
+import 'package:feelm/View/oneline_reviews.dart';
 import 'package:feelm/json/movie_json.dart';
 import 'package:feelm/main.dart';
 
@@ -67,10 +68,40 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         .collection('favorite');
 
     if (isFavorite) {
-      //즐겨찾기 해제
-      await favoriteCollection.doc(widget.movieName).delete();
+      // 다이얼로그 표시
+      final shouldRemove = await showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text(
+              "이미 작성한 다이어리가 있다면 삭제됩니다.\n즐겨찾기를 해제하시겠습니까?",
+              style: TextStyle(fontSize: 16), // 폰트 크기 조정
+              textAlign: TextAlign.center,
+            ),
+            actionsAlignment: MainAxisAlignment.spaceEvenly, // 버튼 동일
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false), // 취소 선택
+                child: const Text("취소"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true), // 확인 선택
+                child: const Text("확인"),
+              ),
+            ],
+          );
+        },
+      );
+
+      // 사용자가 '확인'을 눌렀을 경우만 삭제 실행
+      if (shouldRemove == true) {
+        await favoriteCollection.doc(widget.movieName).delete();
+        setState(() {
+          isFavorite = false;
+        });
+      }
     } else {
-      //즐겨찾기 추가
+      // 즐겨찾기 추가
       await favoriteCollection.doc(widget.movieName).set({
         'title': selectedMovie!.title,
         'poster': selectedMovie!.poster,
@@ -79,10 +110,10 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         'diaryText': "",
         'savedDate': "",
       });
+      setState(() {
+        isFavorite = true;
+      });
     }
-    setState(() {
-      isFavorite = !isFavorite;
-    });
   }
 
   @override
@@ -287,9 +318,11 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         ),
                       ),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      // const SizedBox(
+                      //   height: 10,
+                      // ),
+                      // Reviews 섹션 추가
+                      OnelineReviews(movieName: widget.movieName),
 
                       Center(
                         child: TextButton(

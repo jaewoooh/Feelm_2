@@ -14,7 +14,7 @@ class DiaryCalendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFDCD1B5),
+      backgroundColor: const Color(0xFFBAD3EE),
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -71,8 +71,8 @@ class DiaryCalendar extends StatelessWidget {
           },
           icon: const Icon(Icons.arrow_back),
         ),
-        title: Text("$selectedDate Diary"),
-        backgroundColor: const Color(0xFFDCD1B5),
+        title: const Text("Diary"),
+        backgroundColor: const Color(0xFFBAD3EE),
         elevation: 0,
         bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1.0),

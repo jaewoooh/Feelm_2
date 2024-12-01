@@ -1,7 +1,11 @@
+// NoteScreen
+
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:feelm/View/calendar_screen.dart';
 import 'package:feelm/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -70,7 +74,7 @@ class _NoteScreenState extends State<NoteScreen> {
         });
       }
     } catch (e) {
-      log('Error loading diary data: $e');
+      //log('Error loading diary data: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('다이어리 기록이 없습니다')),
@@ -85,7 +89,7 @@ class _NoteScreenState extends State<NoteScreen> {
       margin: const EdgeInsets.all(20.0),
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: const Color(0xFFEFE6D9),
+        color: const Color(0xFFE5ECF5),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -317,6 +321,10 @@ class _NoteScreenState extends State<NoteScreen> {
 
             // Navigator.pop도 안전하게 호출
             if (mounted) {
+              // 저장 후 selectedPosterTitleNotifier 초기화
+              CalendarscreenState.selectedPosterTitleNotifier.value = null;
+              log("초기화 완료");
+
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Navigator.pop(context, {
                   'savedDate': DateFormat('yyyy-MM-dd')
