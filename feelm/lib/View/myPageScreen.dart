@@ -107,7 +107,7 @@ class _MypagescreenState extends State<Mypagescreen> {
                 children: [
                   const CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage('assets/userprofile_sangwon.png'),//상원님 이미지로 교체
+                    backgroundImage: AssetImage('assets/userprofile2.png'),//상원님 이미지로 교체
                   ),
                   const SizedBox(width: 16),
                   Column(
