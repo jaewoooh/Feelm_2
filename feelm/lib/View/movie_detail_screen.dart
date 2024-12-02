@@ -71,7 +71,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         'title': selectedMovie!.title,
         'poster': selectedMovie!.poster,
         'genre': selectedMovie!.genre,
-        'runtime': selectedMovie!.runtime
+        'runtime': selectedMovie!.runtime,
+        'savedDate': selectedMovie!.savedData,
       });
     }
     setState(() {

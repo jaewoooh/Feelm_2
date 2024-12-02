@@ -53,4 +53,6 @@ class MovieJson {
         year:
             json['year'] is String ? int.tryParse(json['year']) : json['year'],
       );
+
+  get savedData => null;
 }

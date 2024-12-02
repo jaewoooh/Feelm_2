@@ -60,7 +60,11 @@ class _LoginScreenState extends State<LoginScreen> {
       if (doc.exists) {
         if (doc['password'] == password) {
           // 로그인 성공
+          final prefs = await SharedPreferences.getInstance();
           await prefs.setString('username', username); //prefs에 username 저장
+          await prefs.setString('email', doc['email']);
+
+          // MainScreen으로 이동
           if (!mounted) return; // Widget이 dispose된 경우 guard
           Navigator.pushReplacement(
             context,
@@ -155,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   final username = _userName.text.trim();
                   final password = _password.text.trim();
                   if (username.isEmpty || password.isEmpty) {
-                    _showErrorDialog(context, '모든 필드를 채워주세요.');
+                    _showErrorDialog('모든 필드를 채워주세요.');
                     return;
                   }
 
@@ -181,42 +185,32 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       } else {
-                        _showErrorDialog(context, '아이디 또는 비밀번호가 올바르지 않습니다.');
+                        _showErrorDialog('아이디 또는 비밀번호가 올바르지 않습니다.');
                       }
                     } else {
-                      _showErrorDialog(context, '아이디 또는 비밀번호가 올바르지 않습니다.');
+                      _showErrorDialog('아이디 또는 비밀번호가 올바르지 않습니다.');
                     }
                   } catch (e) {
-                    _showErrorDialog(context, '로그인 실패: $e');
+                    _showErrorDialog('로그인 실패: $e');
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF000000),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 12,
-                  ),
-
-                onPressed: _handleLogin,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF000000),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 5,
+                backgroundColor: const Color(0xFF000000),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text(
-                  'LogIn',
-                  style: TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontSize: 16,
-                  ),
-                ),
+                elevation: 5,
               ),
-              const SizedBox(height: 20),
+              child: const Text(
+              'LogIn',
+              style: TextStyle(
+                color: Color(0xFFFFFFFF), // 텍스트 색상 (흰색)
+                fontSize: 16, // 텍스트 크기
+              ),
+            ),
+          ),
+          const SizedBox(height: 20), // 간격 추가
 
               // 비밀번호 찾기
               const Text(
