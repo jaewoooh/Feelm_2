@@ -6,17 +6,15 @@ import 'login.dart';
 
 late SharedPreferences prefs;
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-runApp(MyApp());
+  runApp(const MyApp());
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Firebase 초기화
   prefs = await SharedPreferences.getInstance(); //인스턴스 생성
   runApp(const MyApp());
-
 }
 
 class MyApp extends StatelessWidget {

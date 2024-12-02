@@ -65,7 +65,7 @@ class _MoviescreenState extends State<Moviescreen> {
     final selectedMovie =
         movieList.isNotEmpty ? movieList[_currentPageIndex] : null;
     return Scaffold(
-      backgroundColor: const Color(0xFFDCD1B5),
+      backgroundColor: const Color(0xFFBAD3EE),
       body: Column(
         children: [
           const SizedBox(
@@ -202,6 +202,10 @@ class _MoviescreenState extends State<Moviescreen> {
 
   // Top Trending
   Widget _buildTopTrendingSection() {
+    // movieList를 year 기준으로 내림차순 정렬
+    final sortedMovies = List<MovieJson>.from(movieList)
+      ..sort((a, b) => (b.year ?? 0).compareTo(a.year ?? 0));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -218,9 +222,10 @@ class _MoviescreenState extends State<Moviescreen> {
           height: 200,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: 5, // 예시로 10개의 아이템만 표시
+            itemCount: sortedMovies.length > 10 ? 10 : sortedMovies.length,
             itemBuilder: (context, index) {
-              return _buildTrendingMovieCard(index);
+              final movie = sortedMovies[index];
+              return _buildTrendingMovieCard(movie); // movie 객체 전달
             },
           ),
         ),
@@ -229,7 +234,7 @@ class _MoviescreenState extends State<Moviescreen> {
   }
 
 // 영화 카드 위젯
-  Widget _buildTrendingMovieCard(int index) {
+  Widget _buildTrendingMovieCard(MovieJson movie) {
     return Container(
       width: 120,
       margin: const EdgeInsets.only(left: 16, right: 8),
@@ -253,39 +258,36 @@ class _MoviescreenState extends State<Moviescreen> {
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
               ),
-              child: Image.asset(
-                'assets/posterEx.png',
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
+              child: movie.poster != null && movie.poster!.isNotEmpty
+                  ? Image.network(
+                      movie.poster!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.error, color: Colors.red);
+                      },
+                    )
+                  : Image.asset(
+                      'assets/posterEx.png',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
             ),
           ),
           //const SizedBox(height: 5),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              'Movie Title $index',
+              movie.title ?? 'Unknown Title',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
+              maxLines: 1,
             ),
           ),
-          // const Padding(
-          //   padding: EdgeInsets.symmetric(horizontal: 8.0),
-          //   child: Row(
-          //     children: [
-          //       Icon(Icons.star, color: Colors.yellow, size: 14),
-          //       SizedBox(width: 4),
-          //       Text('4.5',
-          //           style: TextStyle(
-          //             fontSize: 12,
-          //             color: Colors.white,
-          //           )),
-          //     ],
-          //   ),
-          // ),
+
           const SizedBox(height: 5),
         ],
       ),

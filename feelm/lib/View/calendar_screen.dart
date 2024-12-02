@@ -1,7 +1,12 @@
+// CalendarScreen
+
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:feelm/View/calendar_poster.dart';
 import 'package:feelm/View/diary_calendar.dart';
 import 'package:feelm/View/my_table_calendar.dart';
+import 'package:feelm/main.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,85 +14,165 @@ class Calendarscreen extends StatefulWidget {
   const Calendarscreen({super.key});
 
   @override
-  State<Calendarscreen> createState() => _CalendarscreenState();
+  State<Calendarscreen> createState() => CalendarscreenState();
 }
 
-class _CalendarscreenState extends State<Calendarscreen> {
+class CalendarscreenState extends State<Calendarscreen> {
   DateTime _focusedDay = DateTime.now();
+  final String? loginId = prefs.getString('username'); //로그인된 아이디 가져오기
+  static final ValueNotifier<String?> selectedPosterTitleNotifier =
+      ValueNotifier<String?>(null);
 
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _onDaySelected(
+      DateTime selectedDay, DateTime focusedDay, String? posterUrl) {
     setState(() {
       _focusedDay = focusedDay;
     });
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+    if (posterUrl != null) {
+      // 클릭한 날짜에 해당하는 포스터가 존재하면 바로 DiaryCalendar로 이동
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DiaryCalendar(
+            selectedDate: selectedDay.toIso8601String(),
+            posterImageUrl: posterUrl,
           ),
-          title: Text(
-            "${DateFormat('MM월 dd일').format(selectedDay)}로 이동하시겠습니까?",
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.black,
+        ),
+      );
+    } else {
+      // 기존 동작: 포스터 선택 후 이동
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 180, 168, 113),
-                    shape: const StadiumBorder(),
-                  ),
-                  child: const Text(
-                    '취소',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DiaryCalendar(
-                          selectedDate:
-                              DateFormat('yyyy년 MM월 dd일').format(selectedDay),
-                        ),
-                      ),
-                    );
-                    log("${DateFormat('MM월 dd일').format(selectedDay)}로 이동");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 180, 168, 113),
-                    shape: const StadiumBorder(),
-                  ),
-                  child: const Text(
-                    '네',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ],
+            title: Text(
+              "${DateFormat('MM월 dd일').format(selectedDay)}로 이동하시겠습니까?",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.black,
+              ),
             ),
-          ],
-        );
-      },
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 180, 168, 113),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: const Text(
+                      '취소',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      final String? selectedPosterTitle =
+                          selectedPosterTitleNotifier.value;
+                      if (selectedPosterTitle == null) {
+                        // 포스터가 선택되지 않았을 경우 경고 표시
+                        Navigator.of(context).pop(); // 기존 다이얼로그 닫기
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text(
+                              "포스터를 먼저 선택해주세요.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            actionsAlignment: MainAxisAlignment.center,
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // 경고 다이얼로그 닫기
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: const StadiumBorder(),
+                                ),
+                                child: const Text(
+                                  "확인",
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        // 포스터가 선택된 경우 처리
+                        _handleSelectedPoster(selectedDay, selectedPosterTitle);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 180, 168, 113),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: const Text(
+                      '네',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _navigateToDiaryCalendar(
+      DateTime selectedDay, String selectedPosterImage) {
+    //if (!mounted) return; // 위젯이 비활성화된 경우 중단
+    Navigator.of(context).pop(); // 기존 다이얼로그 닫기
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DiaryCalendar(
+          selectedDate: selectedDay.toIso8601String(),
+          posterImageUrl: selectedPosterImage, // 포스터 URL 전달
+        ),
+      ),
     );
+  }
+
+  void _handleSelectedPoster(DateTime selectedDay, String selectedPosterTitle) {
+    String selectedPosterImage = '';
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(loginId)
+        .collection('favorite')
+        .where('title', isEqualTo: selectedPosterTitle)
+        .get()
+        .then((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        selectedPosterImage = snapshot.docs.first['poster'] ?? '';
+      }
+    }).whenComplete(() {
+      _navigateToDiaryCalendar(
+          selectedDay, selectedPosterImage); // 안전한 Navigator 호출
+      log("${DateFormat('MM월 dd일').format(selectedDay)}로 이동");
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFDCD1B5),
+      backgroundColor: const Color(0xFFBAD3EE), //0xFFBAD3EE ,0xFFDCD1B5
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -148,54 +233,14 @@ class _CalendarscreenState extends State<Calendarscreen> {
             ),
             const SizedBox(height: 10),
             // 포스터 리스트 추가
-            PosterListView.build(itemCount: 5),
+            PosterListView(
+              currentUser: loginId!,
+              onPosterSelected: (title) {
+                selectedPosterTitleNotifier.value = title;
+              },
+            ),
             const SizedBox(height: 50),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// 포스터 리스트 관련 클래스
-class PosterListView {
-  static Widget build({required int itemCount}) {
-    return SizedBox(
-      height: 200,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(itemCount, (index) {
-            return Container(
-              width: 140,
-              margin: const EdgeInsets.only(left: 30, right: 30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.black54,
-                  width: 2.0,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 2,
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  "Poster ${index + 1}",
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            );
-          }),
         ),
       ),
     );
