@@ -81,7 +81,7 @@ flutter:
     - assets/upPoster.png
     - assets/downPoster.png
     - assets/myprofile.png
-    - assets/userprofile.png
+    - assets/userprofile2.png
     - assets/Favorites.png
     - assets/topTrend.png
     - assets/json/movie_top500.json

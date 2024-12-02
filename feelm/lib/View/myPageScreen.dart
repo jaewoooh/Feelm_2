@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -63,7 +64,7 @@ class _MypagescreenState extends State<Mypagescreen> {
           .collection('users')
           .doc(loginId)
           .collection('favorite')
-          .orderBy('savedDate', descending: true) // 날짜 기준 정렬
+          .orderBy('savedDate', descending: true) 
           .get();
 
       setState(() {
@@ -71,7 +72,7 @@ class _MypagescreenState extends State<Mypagescreen> {
           final data = doc.data() as Map<String, dynamic>;
           return {
             ...data,
-            'savedDate': data['savedDate'] ?? "알 수 없음", // savedDate를 그대로 사용
+            'savedDate': data['savedDate'] ?? "알 수 없음", 
           };
         }).toList();
       });
@@ -107,7 +108,7 @@ class _MypagescreenState extends State<Mypagescreen> {
                 children: [
                   const CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage('assets/userprofile_sangwon.png'),//상원님 이미지로 교체
+                    backgroundImage: AssetImage('assets/userprofile2.png'),
                   ),
                   const SizedBox(width: 16),
                   Column(
