@@ -1,3 +1,4 @@
+import 'package:feelm/View/calendar_screen.dart';
 import 'package:feelm/View/note_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -49,6 +50,8 @@ class DiaryCalendar extends StatelessWidget {
                         ),
                         ElevatedButton(
                           onPressed: () {
+                            CalendarscreenState
+                                .selectedPosterTitleNotifier.value = null;
                             Navigator.of(context).pop(true); // 다이얼로그 닫기
                             Navigator.of(context).pop(); // 이전 화면으로 이동
                           },

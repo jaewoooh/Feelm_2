@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:feelm/View/movie_Detail_Screen.dart';
+import 'package:feelm/View/movie_poster_view.dart';
 import 'package:feelm/View/search_movie.dart';
+import 'package:feelm/View/selected_movie_info.dart';
 import 'package:feelm/json/movie_json.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,22 +19,22 @@ class Moviescreen extends StatefulWidget {
 class _MoviescreenState extends State<Moviescreen> {
   final PageController _pageController = PageController(viewportFraction: 0.5);
   List<MovieJson> movieList = [];
-  int _currentPageIndex = 0; // 현재 선택된 페이지의 인덱스
+  MovieJson? selectedMovie; // 현재 선택된 영화 정보
 
   @override
   void initState() {
     super.initState();
     _loadMovies();
 
-    // PageController의 리스너 추가
-    _pageController.addListener(() {
-      final int newPageIndex = _pageController.page?.round() ?? 0;
-      if (newPageIndex != _currentPageIndex) {
-        setState(() {
-          _currentPageIndex = newPageIndex;
-        });
-      }
-    });
+    // // PageController의 리스너 추가
+    // _pageController.addListener(() {
+    //   final int newPageIndex = _pageController.page?.round() ?? 0;
+    //   if (newPageIndex != _currentPageIndex) {
+    //     setState(() {
+    //       _currentPageIndex = newPageIndex;
+    //     });
+    //   }
+    // });
   }
 
   /// JSON 파일을 로드하고 파싱하는 함수
@@ -48,22 +50,29 @@ class _MoviescreenState extends State<Moviescreen> {
 
       setState(() {
         movieList = moviesData.map((json) => MovieJson.fromJson(json)).toList();
+        if (movieList.isNotEmpty) {
+          selectedMovie = movieList[0]; // 처음에는 첫 번째 영화를 선택
+        }
+        log("Movie List: ${movieList.map((m) => m.title).toList()}");
       });
     } catch (e) {
       log("Error loading JSON: $e");
     }
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _pageController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final selectedMovie =
-        movieList.isNotEmpty ? movieList[_currentPageIndex] : null;
+    if (movieList.isEmpty) {
+      // 영화 리스트가 비어 있으면 로딩 스피너 표시
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFBAD3EE),
       body: Column(
@@ -131,15 +140,14 @@ class _MoviescreenState extends State<Moviescreen> {
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
-                SizedBox(
-                  height: 220,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: movieList.length > 10 ? 10 : movieList.length,
-                    itemBuilder: (context, index) {
-                      return _buildPosterCard(index);
-                    },
-                  ),
+                PosterPageView(
+                  pageController: _pageController,
+                  //movieList: movieList,
+                  onMovieSelected: (movie) {
+                    setState(() {
+                      selectedMovie = movie;
+                    });
+                  },
                 ),
                 Image.asset(
                   'assets/downPoster.png',
@@ -151,48 +159,11 @@ class _MoviescreenState extends State<Moviescreen> {
           ),
           const SizedBox(height: 5),
           // 중앙 포스터의 제목과 런닝 타임을 표시
-          if (selectedMovie != null) ...[
-            Text(
-              selectedMovie.title ?? '영화제목',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'time : ${selectedMovie.runtime}분',
-              style: const TextStyle(color: Color.fromARGB(255, 139, 139, 139)),
-            ),
-            const SizedBox(height: 5),
-          ],
-
-          ElevatedButton(
-            onPressed: () {
-              if (selectedMovie != null) {
-                final selectedMovie = movieList[_currentPageIndex];
-                log('영화정보보기');
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MovieDetailScreen(
-                            movieName: selectedMovie.title ?? '',
-                            movieList: movieList,
-                          )),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(221, 19, 18, 18),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 100, vertical: 10),
-              child: Text(
-                '영화 정보 보기',
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
+          SelectedMovieInfo(
+            selectedMovie: selectedMovie,
+            movieList: movieList,
           ),
+
           const SizedBox(height: 10),
           _buildTopTrendingSection()
         ],
@@ -222,7 +193,7 @@ class _MoviescreenState extends State<Moviescreen> {
           height: 200,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: sortedMovies.length > 10 ? 10 : sortedMovies.length,
+            itemCount: sortedMovies.length > 15 ? 15 : sortedMovies.length,
             itemBuilder: (context, index) {
               final movie = sortedMovies[index];
               return _buildTrendingMovieCard(movie); // movie 객체 전달
@@ -291,69 +262,6 @@ class _MoviescreenState extends State<Moviescreen> {
           const SizedBox(height: 5),
         ],
       ),
-    );
-  }
-
-  // 포스터 카드 위젯 함수
-  Widget _buildPosterCard(int index) {
-    if (index >= movieList.length) return const SizedBox.shrink();
-
-    final movie = movieList[index];
-    final posterUrl = movie.poster ?? '';
-
-    return AnimatedBuilder(
-      animation: _pageController,
-      builder: (context, child) {
-        double value = 1.0;
-        if (_pageController.position.haveDimensions) {
-          value = (_pageController.page! - index).abs();
-          value = (1 - (value * 0.3)).clamp(0.7, 1.0);
-        }
-
-        return Center(
-          child: Container(
-            height: Curves.easeOut.transform(value) * 220,
-            width: Curves.easeOut.transform(value) * 140,
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: posterUrl.isNotEmpty
-                  ? Image.network(
-                      posterUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        log("Failed to load image: $posterUrl");
-                        return const Center(
-                          child: Icon(Icons.error, color: Colors.red),
-                        );
-                      },
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) return child;
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      },
-                    )
-                  : const Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        color: Colors.grey,
-                      ),
-                    ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
