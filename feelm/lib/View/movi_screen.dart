@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:feelm/View/movie_Detail_Screen.dart';
 import 'package:feelm/View/movie_poster_view.dart';
 import 'package:feelm/View/search_movie.dart';
 import 'package:feelm/View/selected_movie_info.dart';
