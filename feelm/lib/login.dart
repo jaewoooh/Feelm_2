@@ -163,14 +163,14 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               RichText(
                 text: TextSpan(
-                  text: "Don't have an account, ",
+                  text: "계정이 없습니다, ",
                   style: const TextStyle(
                     color: Color(0xFF666666),
                     fontSize: 14,
                   ),
                   children: [
                     TextSpan(
-                      text: 'Sign Up',
+                      text: '화원가입 하기',
                       style: const TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.bold,
