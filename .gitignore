@@ -1,6 +1,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/dart,swift,xcode,flutter,android,androidstudio
 # Edit at https://www.toptal.com/developers/gitignore?templates=dart,swift,xcode,flutter,android,androidstudio
 
+.DS_store
+
 ### Android ###
 # Gradle files
 .gradle/

@@ -1,9 +1,10 @@
 // ignore_for_file: file_names
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class Mypagescreen extends StatefulWidget {
   const Mypagescreen({super.key});
@@ -43,7 +44,7 @@ class _MypagescreenState extends State<Mypagescreen> {
           });
         }
       } catch (e) {
-        print('Firestore 데이터 가져오기 실패: $e');
+        log('Firestore 데이터 가져오기 실패: $e');
       }
     }
   }
@@ -54,7 +55,7 @@ class _MypagescreenState extends State<Mypagescreen> {
       final String? loginId = prefs.getString('username'); // 로그인 ID 가져오기
 
       if (loginId == null) {
-        print("로그인 ID를 찾을 수 없습니다.");
+        log("로그인 ID를 찾을 수 없습니다.");
         return;
       }
 
@@ -68,7 +69,7 @@ class _MypagescreenState extends State<Mypagescreen> {
 
       setState(() {
         favorites = querySnapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           return {
             ...data,
             'savedDate': data['savedDate'] ?? "알 수 없음", // savedDate를 그대로 사용
@@ -76,7 +77,7 @@ class _MypagescreenState extends State<Mypagescreen> {
         }).toList();
       });
     } catch (e) {
-      print("즐겨찾기 데이터를 가져오는 중 오류 발생: $e");
+      log("즐겨찾기 데이터를 가져오는 중 오류 발생: $e");
     }
   }
 
@@ -107,7 +108,8 @@ class _MypagescreenState extends State<Mypagescreen> {
                 children: [
                   const CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage('assets/userprofile2.png'),//상원님 이미지로 교체
+                    backgroundImage:
+                        AssetImage('assets/userprofile2.png'), //상원님 이미지로 교체
                   ),
                   const SizedBox(width: 16),
                   Column(
@@ -154,7 +156,7 @@ class _MypagescreenState extends State<Mypagescreen> {
                           rating: movie['rating'] ?? 0.0,
                           genre: movie['genre'] ?? '장르 없음',
                           runtime: movie['runtime'] ?? 0,
-                           createdAt: movie['savedDate'],
+                          createdAt: movie['savedDate'],
                         );
                       },
                     ),
@@ -164,7 +166,7 @@ class _MypagescreenState extends State<Mypagescreen> {
       ),
     );
   }
-  
+
   Widget _buildFavoriteMovieCard({
     required String title,
     required String imagePath,
@@ -200,7 +202,8 @@ class _MypagescreenState extends State<Mypagescreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text("저장된 날짜: $createdAt"),

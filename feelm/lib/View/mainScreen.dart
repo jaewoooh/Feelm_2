@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:feelm/View/calendar_screen.dart';
-import 'package:feelm/View/movieScreen.dart';
+import 'package:feelm/View/movi_screen.dart';
 import 'package:feelm/View/myPageScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +49,7 @@ class _MainScreenState extends State<MainScreen>
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50.0), // 앱바 높이 조정
           child: AppBar(
-            backgroundColor: const Color(0xFFDCD1B5), // 배경색 설정
+            backgroundColor: const Color(0xFFBAD3EE), // 배경색 설정
             elevation: 0, // 그림자 제거
             flexibleSpace: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -99,10 +99,9 @@ class _MainScreenState extends State<MainScreen>
         body: TabBarView(
           controller: _tabController,
           children: const [
-
-            const Moviescreen(), // 영화 화면
-            const Calendarscreen(), // 캘린더 화면
-            const Mypagescreen(), // 마이페이지 화면
+            Moviescreen(), // 영화 화면
+            Calendarscreen(), // 캘린더 화면
+            Mypagescreen(), // 마이페이지 화면
           ],
         ),
       ),
