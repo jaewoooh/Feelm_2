@@ -1,3 +1,5 @@
+// 사용자는 사용자 이름(username), 비밀번호(password), 이메일(email)을 입력하고, Firebase Firestore에 저장하여 계정을 생성할 수 있습니다. 
+// 추가적으로, 카카오와 네이버 로그인 버튼이 포함되어 있어 확장 가능성을 제공
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
