@@ -31,7 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   final password = _password.text.trim();
 
                   if (username.isEmpty || password.isEmpty) {
-                    _showErrorDialog(context, '모든 필드를 채워주세요.');
+                    _showErrorDialog('모든 필드를 채워주세요.');
                     return;
                   }
 
@@ -159,6 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontSize: 16,
                   ),
                 ),
+                elevation: 5,
               ),
               const SizedBox(height: 20),
               const Text(
