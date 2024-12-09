@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   final password = _password.text.trim();
 
                   if (username.isEmpty || password.isEmpty) {
-                    _showErrorDialog('모든 필드를 채워주세요.');
+                    _showErrorDialog(context, '모든 필드를 채워주세요.');
                     return;
                   }
 
@@ -149,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  elevation: 5,
+                  elevation: 5, // 여기에서 elevation을 설정합니다.
                 ),
                 child: const Text(
                   'LogIn',
@@ -157,15 +158,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Color(0xFFFFFFFF),
                     fontSize: 16,
                   ),
-                ),
-                elevation: 5,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'forgot password?',
-                style: TextStyle(
-                  color: Color(0xFF666666),
-                  fontSize: 14,
                 ),
               ),
               const SizedBox(height: 20),
