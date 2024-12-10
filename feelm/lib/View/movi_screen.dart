@@ -52,7 +52,7 @@ class _MoviescreenState extends State<Moviescreen> {
         if (movieList.isNotEmpty) {
           selectedMovie = movieList[0]; // 처음에는 첫 번째 영화를 선택
         }
-        log("Movie List: ${movieList.map((m) => m.title).toList()}");
+        //log("Movie List: ${movieList.map((m) => m.title).toList()}");
       });
     } catch (e) {
       log("Error loading JSON: $e");

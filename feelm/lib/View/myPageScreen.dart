@@ -1,3 +1,5 @@
+// MyPage
+
 // ignore_for_file: file_names
 
 import 'dart:developer';
@@ -10,10 +12,10 @@ class Mypagescreen extends StatefulWidget {
   const Mypagescreen({super.key});
 
   @override
-  _MypagescreenState createState() => _MypagescreenState();
+  MypagescreenState createState() => MypagescreenState();
 }
 
-class _MypagescreenState extends State<Mypagescreen> {
+class MypagescreenState extends State<Mypagescreen> {
   String? userName; // 로그인한 사용자의 이름
   String? userEmail; // 로그인한 사용자의 이메일
   List<Map<String, dynamic>> favorites = []; // 즐겨찾기 데이터를 저장 리스트

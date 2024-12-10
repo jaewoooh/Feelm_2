@@ -1,5 +1,3 @@
-//사용자가 선택한 날짜와 포스터 이미지를 기반으로 다이어리 작성 화면을 표시하며,
-// 특정 조건에 따라 뒤로가기 동작 및 알림 창(다이얼로그)을 제공
 import 'package:feelm/View/calendar_screen.dart';
 import 'package:feelm/View/note_screen.dart';
 import 'package:flutter/material.dart';

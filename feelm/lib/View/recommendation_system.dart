@@ -1,6 +1,6 @@
 class GenreScores {
   static const Map<String, int> scores = {
-    '드라마': 100,
+    '드라마': 65,
     '액션': 96,
     '코미디': 92,
     '범죄': 88,

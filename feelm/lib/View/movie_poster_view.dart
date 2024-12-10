@@ -49,7 +49,7 @@ class _PosterPageViewState extends State<PosterPageView> {
 
       movieList = moviesData.map((json) => MovieJson.fromJson(json)).toList();
 
-      log("Loaded Movie List in PosterPageView: ${movieList.map((m) => m.title).toList()}");
+      //log("Loaded Movie List in PosterPageView: ${movieList.map((m) => m.title).toList()}");
 
       // 사용자 데이터 기반 필터링
       await _filterMovies();
@@ -101,7 +101,7 @@ class _PosterPageViewState extends State<PosterPageView> {
 
     log("Top Genre: $topGenre");
     log("Average Runtime: $averageRuntime");
-    log("Filtered Movies: ${filteredMovies.map((m) => m.title).toList()}");
+    //log("Filtered Movies: ${filteredMovies.map((m) => m.title).toList()}");
   }
 
   /// Firebase에서 favorite 영화 타이틀 가져오기

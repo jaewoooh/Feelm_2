@@ -1,5 +1,3 @@
-// 사용자는 사용자 이름(username), 비밀번호(password), 이메일(email)을 입력하고, Firebase Firestore에 저장하여 계정을 생성할 수 있습니다. 
-// 추가적으로, 카카오와 네이버 로그인 버튼이 포함되어 있어 확장 가능성을 제공
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -110,58 +108,6 @@ class SignUpScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // 카카오 로그인 버튼
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // 카카오 로그인 처리 로직 (아직 구현되지 않음)
-                  },
-                  icon: const Icon(Icons.chat_bubble, color: Colors.black),
-                  label: const Text(
-                    '카카오 로그인',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFE812),
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // 네이버 로그인 버튼
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // 네이버 로그인 처리 로직 (아직 구현되지 않음)
-                  },
-                  icon: const Text(
-                    'N',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  label: const Text(
-                    '네이버 로그인',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF03C75A),
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

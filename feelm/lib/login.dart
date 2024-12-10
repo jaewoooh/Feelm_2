@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  elevation: 5, // 여기에서 elevation을 설정합니다.
+                  elevation: 5,
                 ),
                 child: const Text(
                   'LogIn',
@@ -161,16 +161,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 20),
+              const Text(
+                'forgot password?',
+                style: TextStyle(
+                  color: Color(0xFF666666),
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 20),
               RichText(
                 text: TextSpan(
-                  text: "계정이 없습니다, ",
+                  text: "Don't have an account, ",
                   style: const TextStyle(
                     color: Color(0xFF666666),
                     fontSize: 14,
                   ),
                   children: [
                     TextSpan(
-                      text: '화원가입 하기',
+                      text: 'Sign Up',
                       style: const TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.bold,
